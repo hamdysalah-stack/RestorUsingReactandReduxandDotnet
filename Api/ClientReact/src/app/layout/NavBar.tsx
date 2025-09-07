@@ -4,12 +4,15 @@ import {
   Badge,
   Box,
   IconButton,
+  LinearProgress,
   List,
   ListItem,
   Toolbar,
   Typography,
 } from "@mui/material";
 import { NavLink } from "react-router-dom";
+import { useAppDispatch, useAppSelector } from "../Store/store";
+import { toggleDarkMode } from "./uiSlice";
 
 const midlinks = [
   { title: "catalog", path: "/catalog" },
@@ -30,12 +33,17 @@ const navstyle = {
   "&.active": { color: "#747576ff" },
 };
 
-type Props = {
-  toggleDarkMode: () => void;
-  darkMode: boolean;
-};
+// type Props = {
+//   toggleDarkMode: () => void;
+//   darkMode: boolean;
+// };
 
-export default function NavBar({ darkMode, toggleDarkMode }: Props) {
+// export default function NavBar({ darkMode, toggleDarkMode }: Props) {
+export default function NavBar() {
+  const { loading, darkMode } = useAppSelector((state) => state.ui);
+
+  const dispatch = useAppDispatch();
+
   return (
     <AppBar position="fixed">
       <Toolbar
@@ -47,32 +55,19 @@ export default function NavBar({ darkMode, toggleDarkMode }: Props) {
       >
         {/* Left side (Logo + Dark/Light Toggle) */}
         <Box sx={{ display: "flex", alignItems: "center" }}>
-          <Typography
-            component={NavLink}
-            sx={navstyle}
-            to="/home"
-            variant="h6"
-          >
+          <Typography component={NavLink} sx={navstyle} to="/home" variant="h6">
             Re-Store
           </Typography>
-          <IconButton onClick={toggleDarkMode}>
-            {darkMode ? (
-              <DarkMode />
-            ) : (
-              <LightMode sx={{ color: "inherit" }} />
-            )}
+          {/* <IconButton onClick={toggleDarkMode}> */}
+          <IconButton onClick={() => dispatch(toggleDarkMode())}>
+            {darkMode ? <DarkMode /> : <LightMode sx={{ color: "inherit" }} />}
           </IconButton>
         </Box>
 
         {/* Center (Midlinks) */}
         <List sx={{ display: "flex", flexDirection: "row" }}>
           {midlinks.map(({ title, path }) => (
-            <ListItem
-              component={NavLink}
-              to={path}
-              key={path}
-              sx={navstyle}
-            >
+            <ListItem component={NavLink} to={path} key={path} sx={navstyle}>
               {title.toUpperCase()}
             </ListItem>
           ))}
@@ -88,18 +83,18 @@ export default function NavBar({ darkMode, toggleDarkMode }: Props) {
 
           <List sx={{ display: "flex", flexDirection: "row" }}>
             {rightlinks.map(({ title, path }) => (
-              <ListItem
-                component={NavLink}
-                to={path}
-                key={path}
-                sx={navstyle}
-              >
+              <ListItem component={NavLink} to={path} key={path} sx={navstyle}>
                 {title.toUpperCase()}
               </ListItem>
             ))}
           </List>
         </Box>
       </Toolbar>
+      {loading && (
+        <Box sx={{ width: "100%" }}>
+          <LinearProgress color="secondary" />
+        </Box>
+      )}
     </AppBar>
   );
 }
